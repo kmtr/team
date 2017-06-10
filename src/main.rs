@@ -26,6 +26,9 @@ extern crate time;
 
 use std::error::Error;
 use std::path::Path;
+use std::sync::mpsc::{Sender, Receiver};
+use std::sync::mpsc;
+use std::thread;
 
 use iron::prelude::*;
 use router::{Router};
@@ -69,7 +72,7 @@ impl AroundMiddleware for Logger {
     }
 }
 
-fn main() {
+fn init_api_chain() -> iron::Chain{
     let router = handlers::router::create_router();
 
     let mut mount = Mount::new();
@@ -97,11 +100,43 @@ fn main() {
 
     chain.around(Logger);
 
-    let mut port = helper::get_env("PORT");
-    if port == "" {
-        port = "3000".to_string();
-    }
-    let listen = format!("{}:{}", "0.0.0.0", port);
-    println!("Listen {:?}", listen);
-    Iron::new(chain).http(listen).unwrap();
+    return chain;
+}
+
+fn init_static_chain() -> iron::Chain {
+    let mut mount = Mount::new();
+    mount.mount("/", Static::new(Path::new("./web/dist/")));
+    return Chain::new(mount);
+}
+
+fn main() {
+
+    let (tx, rx): (Sender<iron::Listening>, Receiver<iron::Listening>) = mpsc::channel();
+    thread::spawn(move || {
+        let api_chain = init_api_chain();
+        let mut port = helper::get_env("PORT");
+        if port == "" {
+            port = "3000".to_string();
+        }
+        let listen = format!("{}:{}", "0.0.0.0", port);
+        println!("Listen {:?}", listen);
+        let res = Iron::new(api_chain).http(listen).unwrap();
+        tx.send(res).unwrap();
+    });
+
+    let (stx, srx): (Sender<iron::Listening>, Receiver<iron::Listening>) = mpsc::channel();
+    thread::spawn(move || {
+        let static_chain = init_static_chain();
+        let mut port = helper::get_env("STATIC_PORT");
+        if port == "" {
+            port = "3100".to_string();
+        }
+        let listen = format!("{}:{}", "0.0.0.0", port);
+        println!("static: Listen {:?}", listen);
+        let res = Iron::new(static_chain).http(listen).unwrap();
+        stx.send(res).unwrap();
+    });
+
+    println!("{:?}", srx.recv().unwrap());
+    println!("{:?}", rx.recv().unwrap());
 }
