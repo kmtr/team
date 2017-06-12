@@ -1,3 +1,10 @@
 import { combineReducers } from 'redux';
 
-export default combineReducers({});
+function reducer(state = {}, action) {
+  console.log(action);
+  return state;
+}
+
+export default combineReducers({
+  reducer,
+});

@@ -60,7 +60,7 @@ const devServer = {
   port: 7000,
   publicPath: '/js',
   historyApiFallback: true,
-  hot: true,
+  hot: false,
   https: false,
   noInfo: true,
 };

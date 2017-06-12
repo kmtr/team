@@ -1,0 +1,7 @@
+[*.{json,js,jsx,html,css,scss}]
+indent_style = space
+indent_size = 2
+
+[.eslintrc]
+indent_style = space
+indent_size = 2

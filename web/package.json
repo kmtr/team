@@ -4,7 +4,7 @@
   "description": "static web for team",
   "scripts": {
     "webpack": "env ENV=development webpack --config webpack.config.babel.js",
-    "webpack:server": "env ENV=development webpack-dev-server --open --hot --inline",
+    "webpack:server": "env ENV=development webpack-dev-server --open --inline",
     "flow": "flow",
     "test": "jest ./",
     "clean": "rm -rf ./dist/*"
@@ -13,7 +13,9 @@
   "license": "ISC",
   "dependencies": {
     "babel-polyfill": "^6.23.0",
+    "bulma": "^0.4.2",
     "history": "^4.6.1",
+    "prop-types": "^15.5.10",
     "query-string": "^4.3.4",
     "react": "^15.5.4",
     "react-dom": "^15.5.4",
@@ -36,6 +38,7 @@
     "enzyme": "^2.8.2",
     "eslint": "^3.19.0",
     "eslint-config-airbnb": "^15.0.1",
+    "eslint-import-resolver-webpack": "^0.8.1",
     "eslint-loader": "^1.7.1",
     "eslint-plugin-import": "^2.3.0",
     "eslint-plugin-jsx-a11y": "^5.0.3",
